@@ -4,22 +4,23 @@ A modern recipe management application built with Next.js 15, TypeScript, and Ta
 
 ## Features
 
-- 🔐 **User Authentication**: Secure login and registration system
-- 🍳 **Recipe Management**: Browse, search, create, and edit recipes
-- ⭐ **Favorites System**: Save your favorite recipes for quick access
-- 🛒 **Shopping Lists**: Create and manage shopping lists with ingredients from recipes
-- ⏱️ **Cooking Timers**: Set multiple timers for different cooking steps with notifications
-- 📱 **Responsive Design**: Works seamlessly on all device sizes
-- 🚀 **Performance Optimized**: Fast loading and search engine friendly
+- 🔐 User Authentication: Secure login and registration system
+- 🍳 Recipe Management: Browse, search, create, and edit recipes
+- ⭐ Favorites System: Save your favorite recipes for quick access
+- 🛒 Shopping Lists: Create and manage shopping lists with ingredients from recipes
+- ⏱️ Cooking Timers: Set multiple timers for different cooking steps with notifications
+- 📱 Responsive Design: Works seamlessly on all device sizes
+- 🚀 Performance Optimized: Fast loading and search engine friendly
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15, TypeScript, Tailwind CSS, Framer Motion
-- **Backend**: Next.js API routes, Prisma ORM, PostgreSQL
-- **Authentication**: NextAuth.js
-- **State Management**: React Context and useReducer
-- **Testing**: Jest, React Testing Library
-- **CI/CD**: GitHub Actions
+- Frontend: Next.js 15, TypeScript, Tailwind CSS, Framer Motion
+- Backend: Next.js API routes, Prisma ORM, PostgreSQL
+- Authentication: NextAuth.js
+- State Management: React Context and useReducer
+- Testing: Jest, React Testing Library
+- CI/CD: GitHub Actions
+- Code Quality: ESLint with TypeScript support
 
 ## Getting Started
 
@@ -32,39 +33,46 @@ A modern recipe management application built with Next.js 15, TypeScript, and Ta
 ### Installation
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/deccs/recipe-finder.git
-   cd recipe-finder
-   ```
+
+```bash
+git clone https://github.com/deccs/recipe-finder.git
+cd recipe-finder
+```
 
 2. Install dependencies:
-   ```bash
-   npm install
-   ```
+
+```bash
+npm install
+```
 
 3. Set up environment variables:
-   ```bash
-   cp .env.example .env.local
-   ```
-   Then fill in your environment variables in `.env.local`:
-   ```
-   DATABASE_URL="postgresql://username:password@host:port/database"
-   NEXTAUTH_SECRET="your-secret-key-here"
-   NEXTAUTH_URL="http://localhost:3000"
-   ```
+
+```bash
+cp .env.example .env.local
+```
+
+Then fill in your environment variables in `.env.local`:
+
+```txt
+DATABASE_URL="postgresql://username:password@host:port/database"
+NEXTAUTH_SECRET="your-secret-key-here"
+NEXTAUTH_URL="http://localhost:3000"
+```
 
 4. Set up the database:
-   ```bash
-   npx prisma migrate dev
-   npx prisma generate
-   ```
+
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
 
 5. Run the development server:
-   ```bash
-   npm run dev
-   ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+```bash
+npm run dev
+```
+
+Open http://localhost:3000 in your browser.
 
 ## Scripts
 
@@ -74,6 +82,87 @@ A modern recipe management application built with Next.js 15, TypeScript, and Ta
 - `npm run lint` - Run ESLint
 - `npm run type-check` - Run TypeScript type checking
 - `npm run test` - Run tests
+
+## ESLint Setup
+
+This project uses ESLint with TypeScript support to maintain code quality and consistency. The setup has been migrated from the deprecated next lint to the modern ESLint CLI.
+
+### Setting up ESLint for Your Project
+
+1. Install ESLint dependencies:
+
+```bash
+npm install eslint @eslint/eslintrc eslint-config-next --save-dev
+```
+
+2. Migrate from next lint to ESLint CLI (if upgrading from an older Next.js version):
+
+```bash
+npx @next/codemod@canary next-lint-to-eslint-cli .
+```
+
+This command will:
+- Create a new eslint.config.mjs file with proper configuration
+- Update the package.json lint script from "next lint" to "eslint ."
+- Add necessary dependencies
+
+3. Configure ESLint:
+
+The `eslint.config.mjs` file extends Next.js's recommended configurations for TypeScript and web vitals:
+
+```javascript
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import { FlatCompat } from "@eslint/eslintrc";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
+
+const eslintConfig = [
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    ignores: [
+      "node_modules/**",
+      ".next/**",
+      "out/**",
+      "build/**",
+      "next-env.d.ts",
+    ],
+  },
+];
+
+export default eslintConfig;
+```
+
+4. Run ESLint:
+
+```bash
+npm run lint
+```
+
+### Fix ESLint issues
+
+The project includes a comprehensive list of ESLint rules to catch common issues. Run the lint command regularly to identify and fix:
+- TypeScript type errors
+- Unused variables and imports
+- Code style inconsistencies
+- Potential security issues
+- Accessibility concerns
+
+### Integrating ESLint with CI/CD
+
+The GitHub Actions workflow in `.github/workflows/ci.yml` includes ESLint as part of the CI pipeline:
+
+```yaml
+- name: Run linter
+  run: npm run lint
+```
+
+This ensures that all code pushed to the repository meets the project's code quality standards.
 
 ## Project Structure
 
@@ -107,13 +196,13 @@ src/
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Contact
 
 Your Name - gbuffat@gmail.com
 
-Project Link: [https://github.com/deccs/recipe-finder](https://github.com/deccs/recipe-finder)
+Project Link: https://github.com/deccs/recipe-finder
 
 ## SSH Setup
 
