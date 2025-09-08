@@ -164,6 +164,183 @@ The GitHub Actions workflow in `.github/workflows/ci.yml` includes ESLint as par
 
 This ensures that all code pushed to the repository meets the project's code quality standards.
 
+## CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration and continuous deployment (CI/CD). The CI/CD pipeline is defined in `.github/workflows/ci.yml` and automates the testing, building, and deployment process.
+
+### Pipeline Triggers
+
+The CI/CD pipeline is triggered by:
+- Pushes to the `main` and `develop` branches
+- Pull requests targeting the `main` branch
+
+### Pipeline Stages
+
+#### 1. Test Stage
+
+The test stage runs on multiple Node.js versions (18.x and 20.x) to ensure compatibility:
+
+```yaml
+test:
+  runs-on: ubuntu-latest
+  strategy:
+    matrix:
+      node-version: [18.x, 20.x]
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run linter
+      run: npm run lint
+    
+    - name: Run type check
+      run: npm run type-check
+    
+    - name: Run tests
+      run: npm run test
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+        NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+```
+
+This stage includes:
+- **Linting**: Runs ESLint to check code quality and consistency
+- **Type Checking**: Runs TypeScript compiler to verify type safety
+- **Testing**: Executes Jest tests to verify functionality
+
+#### 2. Build Stage
+
+The build stage creates a production-ready build of the application:
+
+```yaml
+build:
+  needs: test
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build application
+      run: npm run build
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+        NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-files
+        path: |
+          .next
+          public
+```
+
+This stage:
+- Depends on the successful completion of the test stage
+- Builds the Next.js application for production
+- Uploads build artifacts for deployment stages
+
+#### 3. Deployment Stages
+
+The pipeline includes two deployment environments:
+
+##### Staging Deployment
+
+Triggered on pushes to the `develop` branch:
+
+```yaml
+deploy-staging:
+  needs: build
+  runs-on: ubuntu-latest
+  if: github.ref == 'refs/heads/develop'
+  environment: staging
+  steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: build-files
+    
+    - name: Deploy to staging
+      run: |
+        echo "Deploying to staging environment..."
+        # Add your deployment commands here
+        # For example, using Vercel, AWS, etc.
+```
+
+##### Production Deployment
+
+Triggered on pushes to the `main` branch:
+
+```yaml
+deploy-production:
+  needs: build
+  runs-on: ubuntu-latest
+  if: github.ref == 'refs/heads/main'
+  environment: production
+  steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: build-files
+    
+    - name: Deploy to production
+      run: |
+        echo "Deploying to production environment..."
+        # Add your deployment commands here
+        # For example, using Vercel, AWS, etc.
+```
+
+### Required Environment Variables and Secrets
+
+The CI/CD pipeline requires the following GitHub secrets to be configured:
+
+- `DATABASE_URL`: Connection string for the database
+- `NEXTAUTH_SECRET`: Secret key for NextAuth.js
+- `NEXTAUTH_URL`: URL for the NextAuth.js application
+
+To configure these secrets:
+1. Go to your GitHub repository
+2. Click on Settings > Secrets and variables > Actions
+3. Add each secret with its corresponding value
+
+### Current Pipeline Status
+
+**Note**: As of the latest analysis, the CI/CD pipeline has several issues that need to be resolved:
+
+1. **Type Checking**: Multiple TypeScript errors need to be fixed
+2. **Testing**: Jest configuration issues need to be addressed
+3. **Build**: Missing dependencies and configuration issues need to be resolved
+
+See the project issues for a detailed list of required fixes.
+
+### Pipeline Best Practices
+
+- **Sequential Execution**: The pipeline follows a sequential approach where each stage depends on the successful completion of the previous stage
+- **Matrix Testing**: The test stage runs on multiple Node.js versions to ensure compatibility
+- **Environment-Specific Deployments**: Separate deployment stages for staging and production environments
+- **Artifact Management**: Build artifacts are uploaded and reused in deployment stages to improve efficiency
+- **Secret Management**: Sensitive information is stored as GitHub secrets and not hardcoded in the pipeline
+
 ## Project Structure
 
 ```
