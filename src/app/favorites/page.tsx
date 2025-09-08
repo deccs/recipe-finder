@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, Clock, Users, ChefHat, ArrowLeft } from 'lucide-react';
+import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 
 interface Recipe {
@@ -122,7 +123,7 @@ export default function FavoritesPage() {
               Your Favorite Recipes
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              All the recipes you've saved for later
+              All the recipes you&apos;ve saved for later
             </p>
           </div>
         </div>

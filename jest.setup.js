@@ -1,6 +1,8 @@
 // Optional: configure or set up a testing framework before each test
 // If you use Jest, you can add this to your jest.setup.js file
 
+import '@testing-library/jest-dom';
+
 // Mock Next.js router
 jest.mock('next/router', () => ({
   useRouter() {
@@ -30,7 +32,7 @@ jest.mock('next/image', () => ({
   __esModule: true,
   default: (props) => {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img {...props} />;
+    return <img {...props} alt={props.alt || ''} />;
   },
 }));
 

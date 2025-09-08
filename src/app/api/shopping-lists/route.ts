@@ -3,6 +3,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
+interface ShoppingListItem {
+  name: string;
+  amount: string | number;
+  unit: string;
+}
+
 // GET all shopping lists for the current user
 export async function GET() {
   try {
@@ -29,7 +35,7 @@ export async function GET() {
     });
 
     return NextResponse.json(shoppingLists);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch shopping lists' },
       { status: 500 }
@@ -62,7 +68,7 @@ export async function POST(request: NextRequest) {
         name,
         userId: session.user.id,
         items: items ? {
-          create: items.map((item: any) => ({
+          create: items.map((item: ShoppingListItem) => ({
             name: item.name,
             amount: item.amount,
             unit: item.unit,
@@ -75,7 +81,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(shoppingList, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to create shopping list' },
       { status: 500 }

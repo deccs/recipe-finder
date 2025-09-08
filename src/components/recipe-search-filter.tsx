@@ -38,7 +38,7 @@ export function RecipeSearchFilter({
     onSearch(searchQuery);
   };
 
-  const handleFilterChange = (key: keyof RecipeFilters, value: any) => {
+  const handleFilterChange = (key: keyof RecipeFilters, value: unknown) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
     onFilter(newFilters);

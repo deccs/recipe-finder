@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardBody, CardHeader, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -162,7 +163,7 @@ export function RecipeForm({
     }
   };
 
-  const handleInputChange = (field: keyof RecipeFormData, value: any) => {
+  const handleInputChange = (field: keyof RecipeFormData, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
     // Clear error when field is updated
@@ -396,9 +397,11 @@ export function RecipeForm({
               <div className="flex items-center space-x-4">
                 {formData.imageUrl ? (
                   <div className="relative w-32 h-32 rounded-lg overflow-hidden">
-                    <img 
-                      src={formData.imageUrl} 
+                    <Image
+                      src={formData.imageUrl}
                       alt="Recipe preview"
+                      width={128}
+                      height={128}
                       className="w-full h-full object-cover"
                     />
                     <button
@@ -518,7 +521,7 @@ export function RecipeForm({
                 
                 {formData.ingredients.length === 0 && (
                   <div className="text-center py-4 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    No ingredients added yet. Click "Add Ingredient" to get started.
+                    No ingredients added yet. Click &quot;Add Ingredient&quot; to get started.
                   </div>
                 )}
               </div>
@@ -609,7 +612,7 @@ export function RecipeForm({
                 
                 {formData.steps.length === 0 && (
                   <div className="text-center py-4 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    No steps added yet. Click "Add Step" to get started.
+                    No steps added yet. Click &quot;Add Step&quot; to get started.
                   </div>
                 )}
               </div>
@@ -660,9 +663,11 @@ export function RecipeForm({
                 Preview:
               </p>
               <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                <img 
-                  src={imageUrlInput} 
+                <Image
+                  src={imageUrlInput}
                   alt="Preview"
+                  width={400}
+                  height={192}
                   className="w-full h-48 object-cover"
                   onError={(e) => {
                     e.currentTarget.src = '';

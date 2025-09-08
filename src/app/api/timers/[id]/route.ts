@@ -31,7 +31,7 @@ export async function GET(
     }
 
     return NextResponse.json(timer);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch timer' },
       { status: 500 }
@@ -72,7 +72,6 @@ export async function PUT(
     // Calculate new end time if duration is updated
     let endTime = existingTimer.endTime;
     if (duration !== undefined && duration !== existingTimer.duration) {
-      const now = new Date();
       endTime = new Date();
       endTime.setSeconds(endTime.getSeconds() + duration);
     }
@@ -91,7 +90,7 @@ export async function PUT(
     });
 
     return NextResponse.json(updatedTimer);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to update timer' },
       { status: 500 }
@@ -134,7 +133,7 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: 'Timer deleted successfully' });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to delete timer' },
       { status: 500 }

@@ -3,6 +3,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
+interface Ingredient {
+  name: string;
+  amount: string | number;
+  unit: string;
+}
+
 // GET all recipes
 export async function GET() {
   try {
@@ -28,7 +34,7 @@ export async function GET() {
     });
 
     return NextResponse.json(recipes);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch recipes' },
       { status: 500 }
@@ -82,7 +88,7 @@ export async function POST(request: NextRequest) {
         tags: tags ? tags.join(',') : '',
         authorId: session.user.id,
         ingredients: {
-          create: ingredients.map((ingredient: any) => ({
+          create: ingredients.map((ingredient: Ingredient) => ({
             name: ingredient.name,
             amount: ingredient.amount,
             unit: ingredient.unit,
@@ -102,7 +108,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(recipe, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to create recipe' },
       { status: 500 }

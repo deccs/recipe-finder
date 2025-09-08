@@ -7,7 +7,7 @@ import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { User, Mail, Calendar, ChefHat, Heart, Settings, LogOut } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+
 
 interface UserSession {
   user?: {
@@ -20,7 +20,7 @@ interface UserSession {
 }
 
 export default function ProfilePage() {
-  const { data: session, status, update } = useSession() as { data: UserSession | null, status: string, update: any };
+  const { data: session, status, update } = useSession() as { data: UserSession | null, status: string, update: (data?: unknown) => Promise<unknown> };
   const router = useRouter();
   
   const [isEditing, setIsEditing] = useState(false);
@@ -35,23 +35,6 @@ export default function ProfilePage() {
     email: '',
     bio: '',
   });
-
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/login');
-    }
-    
-    if (session?.user) {
-      setFormData({
-        name: session.user.name || '',
-        email: session.user.email || '',
-        bio: '',
-      });
-      
-      // Fetch user stats
-      fetchUserStats();
-    }
-  }, [session, status, router]);
 
   const fetchUserStats = async () => {
     if (!session?.user?.id) return;
@@ -75,6 +58,24 @@ export default function ProfilePage() {
       console.error('Error fetching user stats:', error);
     }
   };
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    }
+    
+    if (session?.user) {
+      setFormData({
+        name: session.user.name || '',
+        email: session.user.email || '',
+        bio: '',
+      });
+      
+      // Fetch user stats
+      fetchUserStats();
+    }
+  }, [session, status, router]);
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -103,15 +104,15 @@ export default function ProfilePage() {
           }
         });
         
-        toast.success('Profile updated successfully!');
+        console.log('Profile updated successfully!');
         setIsEditing(false);
       } else {
         const error = await response.json();
-        toast.error(error.message || 'Failed to update profile');
+        console.error(error.message || 'Failed to update profile');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('An unexpected error occurred');
+      console.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -125,10 +126,10 @@ export default function ProfilePage() {
       
       // Redirect to home page after sign out
       router.push('/');
-      toast.success('You have been signed out');
+      console.log('You have been signed out');
     } catch (error) {
       console.error('Error signing out:', error);
-      toast.error('An unexpected error occurred');
+      console.error('An unexpected error occurred');
     }
   };
 
@@ -259,7 +260,7 @@ export default function ProfilePage() {
                     </p>
                     
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       onClick={() => setIsEditing(true)}
                       className="w-full"
                     >
@@ -325,7 +326,7 @@ export default function ProfilePage() {
             <CardBody>
               <div className="space-y-3">
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   className="w-full flex items-center justify-center"
                   onClick={() => router.push('/recipes/create')}
                 >
@@ -334,7 +335,7 @@ export default function ProfilePage() {
                 </Button>
                 
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   className="w-full flex items-center justify-center"
                   onClick={() => router.push('/favorites')}
                 >
@@ -343,7 +344,7 @@ export default function ProfilePage() {
                 </Button>
                 
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   className="w-full flex items-center justify-center"
                   onClick={() => router.push('/my-recipes')}
                 >

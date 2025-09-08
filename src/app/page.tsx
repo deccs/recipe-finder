@@ -31,7 +31,7 @@ export default function Home() {
                 </Button>
               </Link>
               <Link href="/recipes/create">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100">
+                <Button variant="ghost" size="lg" className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100">
                   Create Recipe
                 </Button>
               </Link>
@@ -127,7 +127,7 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-4 italic">
-                  "Recipe Finder has completely transformed how I plan meals. The shopping list feature saves me so much time!"
+                  &ldquo;Recipe Finder has completely transformed how I plan meals. The shopping list feature saves me so much time!&rdquo;
                 </p>
                 <p className="font-medium text-gray-900 dark:text-white">- Sarah M.</p>
               </CardBody>
@@ -141,7 +141,7 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-4 italic">
-                  "As a busy parent, the timer feature is a lifesaver. I can set multiple timers and never burn dinner again!"
+                  &ldquo;As a busy parent, the timer feature is a lifesaver. I can set multiple timers and never burn dinner again!&rdquo;
                 </p>
                 <p className="font-medium text-gray-900 dark:text-white">- Michael T.</p>
               </CardBody>
@@ -155,7 +155,7 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-4 italic">
-                  "I love being able to save my family's favorite recipes. The interface is so intuitive and easy to use."
+                  &ldquo;I love being able to save my family&apos;s favorite recipes. The interface is so intuitive and easy to use.&rdquo;
                 </p>
                 <p className="font-medium text-gray-900 dark:text-white">- Jennifer L.</p>
               </CardBody>
@@ -178,7 +178,7 @@ export default function Home() {
               </Button>
             </Link>
             <Link href="/recipes">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto">
+              <Button variant="ghost" size="lg" className="w-full sm:w-auto">
                 Browse Recipes
               </Button>
             </Link>

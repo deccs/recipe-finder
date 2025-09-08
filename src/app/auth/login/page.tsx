@@ -1,19 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn, getSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const callbackUrl = searchParams?.get('callbackUrl') || '/';
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,14 +31,14 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        toast.error('Invalid email or password');
+        console.error('Invalid email or password');
       } else {
-        toast.success('Login successful!');
+        console.log('Login successful!');
         router.push(callbackUrl);
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('An unexpected error occurred');
+      console.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -197,7 +196,7 @@ export default function LoginPage() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <Link href="/auth/register" className="font-medium text-blue-600 hover:text-blue-500">
                   Sign up
                 </Link>

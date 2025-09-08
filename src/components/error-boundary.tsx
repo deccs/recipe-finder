@@ -19,6 +19,7 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
+  static displayName = 'ErrorBoundary';
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -79,7 +80,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <CardBody>
               <div className="text-center mb-6">
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  We're sorry, but something unexpected happened. Our team has been notified.
+                  We&apos;re sorry, but something unexpected happened. Our team has been notified.
                 </p>
                 
                 {process.env.NODE_ENV === 'development' && this.state.error && (
@@ -113,7 +114,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 
                 <Link href="/" className="w-full">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     className="w-full flex items-center justify-center"
                   >
                     <Home className="h-4 w-4 mr-2" />
@@ -136,11 +137,15 @@ export function withErrorBoundary<P extends object>(
   Component: ComponentType<P>,
   fallback?: ReactNode
 ): FC<P> {
-  return (props: P) => (
+  const WrappedComponent = (props: P) => (
     <ErrorBoundary fallback={fallback}>
       <Component {...props} />
     </ErrorBoundary>
   );
+  
+  WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
+  
+  return WrappedComponent;
 }
 
 // Hook for handling async errors in components

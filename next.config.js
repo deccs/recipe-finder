@@ -15,17 +15,19 @@ const nextConfig = {
   // Experimental features
   experimental: {
     // Enable server actions
-    serverActions: true,
+    serverActions: {
+      // Server actions configuration
+    },
     // Enable optimized package imports
     optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
   
   // Webpack configuration for performance
-  webpack: (config, { dev, isServer }) => {
+  webpack: async (config, { dev, isServer }) => {
     // Only use the plugin in production
     if (!dev && !isServer) {
       // Use the compression plugin for gzip
-      const CompressionPlugin = require('compression-webpack-plugin');
+      const CompressionPlugin = (await import('compression-webpack-plugin')).default;
       config.plugins.push(
         new CompressionPlugin({
           algorithm: 'gzip',
@@ -96,4 +98,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;

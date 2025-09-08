@@ -34,7 +34,7 @@ export async function GET() {
     });
 
     return NextResponse.json(favorites);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch favorites' },
       { status: 500 }
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(favorite, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to create favorite' },
       { status: 500 }

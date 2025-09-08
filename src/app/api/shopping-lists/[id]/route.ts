@@ -3,6 +3,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
+interface ShoppingListItem {
+  name: string;
+  amount: string | number;
+  unit: string;
+  completed?: boolean;
+}
+
 // GET a single shopping list by ID
 export async function GET(
   request: NextRequest,
@@ -41,7 +48,7 @@ export async function GET(
     }
 
     return NextResponse.json(shoppingList);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch shopping list' },
       { status: 500 }
@@ -83,7 +90,7 @@ export async function PUT(
     }
 
     // Update shopping list
-    const updatedShoppingList = await prisma.shoppingList.update({
+    await prisma.shoppingList.update({
       where: {
         id: params.id,
       },
@@ -103,7 +110,7 @@ export async function PUT(
 
       // Create new items
       await prisma.shoppingListItem.createMany({
-        data: items.map((item: any) => ({
+        data: items.map((item: ShoppingListItem) => ({
           name: item.name,
           amount: item.amount,
           unit: item.unit,
@@ -128,7 +135,7 @@ export async function PUT(
     });
 
     return NextResponse.json(shoppingList);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to update shopping list' },
       { status: 500 }
@@ -174,7 +181,7 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: 'Shopping list deleted successfully' });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to delete shopping list' },
       { status: 500 }

@@ -39,17 +39,6 @@ export default function ShoppingListDetailPage() {
   const [newItemQuantity, setNewItemQuantity] = useState('');
   const [isAddingItem, setIsAddingItem] = useState(false);
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/login');
-      return;
-    }
-    
-    if (status === 'authenticated' && listId) {
-      fetchShoppingList();
-    }
-  }, [status, router, listId]);
-
   const fetchShoppingList = async () => {
     setIsLoading(true);
     setError(null);
@@ -245,7 +234,7 @@ export default function ShoppingListDetailPage() {
                 </p>
               </div>
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={() => setIsEditing(true)}
               >
                 Edit Name
@@ -256,7 +245,7 @@ export default function ShoppingListDetailPage() {
         
         <div className="flex space-x-3 mb-6">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={handleAddIngredientsFromRecipe}
             className="flex items-center"
           >
@@ -345,7 +334,7 @@ export default function ShoppingListDetailPage() {
               Shopping list not found
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              The shopping list you're looking for doesn't exist
+              The shopping list you&apos;re looking for doesn&apos;t exist
             </p>
             <Button
               variant="primary"
