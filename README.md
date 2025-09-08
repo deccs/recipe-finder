@@ -19,7 +19,8 @@ A modern recipe management application built with Next.js 15, TypeScript, and Ta
 - Authentication: NextAuth.js
 - State Management: React Context and useReducer
 - Testing: Jest, React Testing Library, @types/testing-library__jest-dom
-- CI/CD: GitHub Actions
+- CI/CD: GitHub Actions, AWS Amplify
+- Monorepo: pnpm workspaces, Turborepo
 - Code Quality: ESLint with TypeScript support
 
 ## Getting Started
@@ -387,6 +388,71 @@ To configure these secrets:
 
 The pipeline is now fully functional and ready for production use.
 
+## AWS Amplify Deployment
+
+This project is configured for deployment to AWS Amplify with support for monorepo architecture. The deployment setup includes custom build scripts, environment configuration, and automated testing.
+
+### Deployment Configuration
+
+The following files have been added to support AWS Amplify deployment:
+
+- `amplify.yml` - Main Amplify configuration with custom build settings
+- `amplify-build-spec.yml` - Alternative build specification
+- `scripts/amplify-build.sh` - Custom build script for monorepo
+- `.env.amplify.template` - Environment variables template
+- `scripts/setup-amplify-env.js` - Environment setup script
+- `scripts/test-deployment-config.js` - Deployment configuration test
+
+### Monorepo Structure
+
+The project has been restructured as a monorepo with the following workspace configuration:
+
+- `pnpm-workspace.yaml` - pnpm workspace configuration
+- `turbo.json` - Turborepo pipeline configuration
+- `recipe-app/` - Second Next.js application in the monorepo
+
+### Deployment Scripts
+
+The following scripts have been added to package.json:
+
+- `npm run setup:amplify` - Set up environment variables for AWS Amplify
+- `npm run test:deployment` - Test the deployment configuration
+
+### Environment Variables
+
+The following environment variables are required for AWS Amplify deployment:
+
+- `DATABASE_URL` - PostgreSQL database connection string
+- `NEXTAUTH_SECRET` - NextAuth.js secret key
+- `NEXTAUTH_URL` - NextAuth.js URL
+- `AWS_ACCESS_KEY_ID` - AWS access key ID
+- `AWS_SECRET_ACCESS_KEY` - AWS secret access key
+- `AWS_REGION` - AWS region
+- `AMPLIFY_APP_ID_STAGING` - AWS Amplify staging app ID
+- `AMPLIFY_APP_ID_PROD` - AWS Amplify production app ID
+
+### Deployment Process
+
+1. Run `npm run setup:amplify` to configure environment variables
+2. Push the code to GitHub
+3. Connect the GitHub repository to AWS Amplify
+4. Configure environment variables in the AWS Amplify console
+5. Deploy the application
+
+### Testing Deployment Configuration
+
+Run the following command to test the deployment configuration:
+
+```bash
+npm run test:deployment
+```
+
+This script will:
+- Check if all required files exist
+- Validate the configuration files
+- Check for common issues
+- Provide recommendations
+
 ### Pipeline Best Practices
 
 - **Sequential Execution**: The pipeline follows a sequential approach where each stage depends on the successful completion of the previous stage
@@ -397,24 +463,41 @@ The pipeline is now fully functional and ready for production use.
 
 ## Project Structure
 
+This project is structured as a monorepo with multiple Next.js applications:
+
 ```
-src/
-├── app/                 # Next.js app directory
-│   ├── api/            # API routes
-│   ├── auth/           # Authentication pages
-│   ├── favorites/      # Favorites pages
-│   ├── recipes/        # Recipe pages
-│   ├── shopping-lists/ # Shopping list pages
-│   ├── timers/         # Timer pages
-│   └── layout.tsx      # Root layout
-├── components/         # React components
-│   ├── ui/             # Base UI components
-│   └── __tests__/      # Component tests
-├── lib/                # Utility libraries
-│   ├── auth/           # Authentication utilities
-│   ├── db/             # Database utilities
-│   └── utils/          # General utilities
-└── types/              # TypeScript type definitions
+├── recipe-app/          # Second Next.js application
+│   ├── src/            # Source code
+│   ├── public/         # Static assets
+│   ├── next.config.ts  # Next.js configuration
+│   └── package.json    # Dependencies and scripts
+├── src/                # Main Next.js application
+│   ├── app/            # Next.js app directory
+│   │   ├── api/       # API routes
+│   │   ├── auth/      # Authentication pages
+│   │   ├── favorites/ # Favorites pages
+│   │   ├── recipes/   # Recipe pages
+│   │   ├── shopping-lists/ # Shopping list pages
+│   │   ├── timers/    # Timer pages
+│   │   └── layout.tsx # Root layout
+│   ├── components/    # React components
+│   │   ├── ui/        # Base UI components
+│   │   └── __tests__/ # Component tests
+│   ├── lib/           # Utility libraries
+│   │   ├── auth/      # Authentication utilities
+│   │   ├── db/        # Database utilities
+│   │   └── utils/     # General utilities
+│   └── types/         # TypeScript type definitions
+├── scripts/            # Deployment and utility scripts
+│   ├── amplify-build.sh       # AWS Amplify build script
+│   ├── setup-amplify-env.js   # Environment setup script
+│   └── test-deployment-config.js # Deployment test script
+├── prisma/             # Prisma schema and migrations
+├── amplify.yml         # AWS Amplify configuration
+├── amplify-build-spec.yml # Alternative build specification
+├── pnpm-workspace.yaml # pnpm workspace configuration
+├── turbo.json          # Turborepo pipeline configuration
+└── package.json        # Root dependencies and scripts
 ```
 
 ## Contributing

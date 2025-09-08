@@ -1,0 +1,33 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - chmod +x scripts/amplify-build.sh
+        - ./scripts/amplify-build.sh preBuild
+    build:
+      commands:
+        - ./scripts/amplify-build.sh build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - recipe-app/node_modules/**/*
+      - .next/cache/**/*
+      - recipe-app/.next/cache/**/*
+test:
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  phases:
+    preTest:
+      commands:
+        - npm ci
+        - npm run test
+    test:
+      commands:
+        - npm run test

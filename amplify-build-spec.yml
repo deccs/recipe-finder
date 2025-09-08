@@ -1,0 +1,29 @@
+version: 0.1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        # Install root dependencies
+        - npm ci
+        # Install recipe-app dependencies
+        - cd recipe-app && npm ci
+        # Generate Prisma client
+        - npx prisma generate
+    build:
+      commands:
+        # Build main application
+        - npm run build
+        # Build recipe-app
+        - cd recipe-app && npm run build
+  artifacts:
+    # IMPORTANT: AWS Amplify needs to know which app to deploy
+    # This assumes we're deploying the main app
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - recipe-app/node_modules/**/*
+      - .next/cache/**/*
+      - recipe-app/.next/cache/**/*

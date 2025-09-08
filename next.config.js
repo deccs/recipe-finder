@@ -6,6 +6,12 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   
+  // Port configuration logging
+  async onServerStart() {
+    console.log('🚀 Main application starting on port 3001');
+    console.log('📝 Recipe application should run on port 3000');
+  },
+  
   // Image optimization
   images: {
     domains: ['images.unsplash.com'],

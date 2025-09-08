@@ -84,11 +84,18 @@ jobs:
       with:
         name: build-files
     
-    - name: Deploy to staging
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+    
+    - name: Deploy to AWS Amplify (Staging)
       run: |
         echo "Deploying to staging environment..."
-        # Add your deployment commands here
-        # For example, using Vercel, AWS, etc.
+        echo "AWS Amplify will automatically deploy when connected to GitHub repository"
+        echo "Manual deployment can be triggered from AWS Amplify console"
 
   deploy-production:
     needs: build
@@ -102,8 +109,15 @@ jobs:
       with:
         name: build-files
     
-    - name: Deploy to production
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+    
+    - name: Deploy to AWS Amplify (Production)
       run: |
         echo "Deploying to production environment..."
-        # Add your deployment commands here
-        # For example, using Vercel, AWS, etc.
+        echo "AWS Amplify will automatically deploy when connected to GitHub repository"
+        echo "Manual deployment can be triggered from AWS Amplify console"

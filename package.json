@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "recipe-app",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -12,7 +16,14 @@
     "test": "jest",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "dev:all": "concurrently \"npm run dev\" \"cd recipe-app && npm run dev\"",
+    "build:all": "npm run build && cd recipe-app && npm run build",
+    "lint:all": "npm run lint && cd recipe-app && npm run lint",
+    "clean": "rm -rf .next && cd recipe-app && rm -rf .next && cd ..",
+    "install:all": "npm install && cd recipe-app && npm install",
+    "setup:amplify": "node scripts/setup-amplify-env.js",
+    "test:deployment": "node scripts/test-deployment-config.js"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
@@ -40,10 +51,12 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/testing-library__jest-dom": "^5.14.9",
+    "concurrently": "^9.0.1",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "js-yaml": "^4.1.0",
     "typescript": "^5"
   }
 }
