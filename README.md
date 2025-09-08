@@ -114,3 +114,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Your Name - gbuffat@gmail.com
 
 Project Link: [https://github.com/deccs/recipe-finder](https://github.com/deccs/recipe-finder)
+
+## SSH Setup
+
+This repository is now configured to use SSH for secure Git operations. SSH keys were generated on 2025-09-08 to enable secure communication with GitHub.
