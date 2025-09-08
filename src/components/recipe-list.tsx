@@ -9,24 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardBody } from '@/components/ui/card';
 import { Plus, ChefHat } from 'lucide-react';
 import Link from 'next/link';
-
-interface Recipe {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl?: string;
-  prepTime?: number;
-  cookTime?: number;
-  servings?: number;
-  difficulty?: string;
-  author: {
-    id: string;
-    name: string;
-  };
-  _count: {
-    favorites: number;
-  };
-}
+import { Recipe } from '@/types/recipe';
 
 interface RecipeListProps {
   initialRecipes?: Recipe[];

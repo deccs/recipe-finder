@@ -2,6 +2,31 @@ import { RecipeList } from '@/components/recipe-list';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { Recipe } from '@/types/recipe';
+
+interface PrismaRecipe {
+  id: string;
+  title: string;
+  description: string;
+  instructions: string;
+  imageUrl?: string | null;
+  prepTime?: number | null;
+  cookTime?: number | null;
+  servings?: number | null;
+  difficulty?: string | null;
+  tags?: string | null;
+  author: {
+    id: string;
+    name: string | null;
+  };
+  _count: {
+    favorites: number;
+  };
+}
+
+interface Favorite {
+  recipeId: string;
+}
 
 async function getRecipes() {
   try {
@@ -24,7 +49,11 @@ async function getRecipes() {
       },
     });
 
-    return recipes;
+    // Transform the recipes to match the Recipe interface
+    return recipes.map((recipe: PrismaRecipe) => ({
+      ...recipe,
+      imageUrl: recipe.imageUrl || undefined,
+    })) as Recipe[];
   } catch (error) {
     console.error('Error fetching recipes:', error);
     return [];
@@ -42,7 +71,7 @@ async function getUserFavorites(userId: string) {
       },
     });
 
-    return favorites.map(favorite => favorite.recipeId);
+    return favorites.map((favorite: Favorite) => favorite.recipeId);
   } catch (error) {
     console.error('Error fetching favorites:', error);
     return [];

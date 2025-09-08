@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+import CompressionPlugin from 'compression-webpack-plugin';
+
 const nextConfig = {
   // Performance optimizations
   compress: true,
@@ -23,11 +25,10 @@ const nextConfig = {
   },
   
   // Webpack configuration for performance
-  webpack: async (config, { dev, isServer }) => {
+  webpack: (config, { dev, isServer }) => {
     // Only use the plugin in production
     if (!dev && !isServer) {
       // Use the compression plugin for gzip
-      const CompressionPlugin = (await import('compression-webpack-plugin')).default;
       config.plugins.push(
         new CompressionPlugin({
           algorithm: 'gzip',

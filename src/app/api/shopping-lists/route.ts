@@ -25,7 +25,7 @@ export async function GET() {
       include: {
         items: {
           orderBy: {
-            createdAt: 'asc',
+            id: 'asc',
           },
         },
       },

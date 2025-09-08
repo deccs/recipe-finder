@@ -7,6 +7,35 @@ import { Button } from '@/components/ui/button';
 import { Heart, Clock, Users, ChefHat, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
+interface Ingredient {
+  id: string;
+  name: string;
+  amount: string | number;
+  unit: string;
+  recipeId: string;
+}
+
+interface Recipe {
+  id: string;
+  title: string;
+  description: string;
+  instructions: string;
+  imageUrl?: string;
+  prepTime?: number;
+  cookTime?: number;
+  servings?: number;
+  difficulty?: string;
+  tags?: string;
+  author: {
+    id: string;
+    name: string;
+  };
+  ingredients: Ingredient[];
+  _count: {
+    favorites: number;
+  };
+}
+
 async function getRecipe(id: string) {
   try {
     const recipe = await prisma.recipe.findUnique({
@@ -22,12 +51,7 @@ async function getRecipe(id: string) {
         },
         ingredients: {
           orderBy: {
-            order: 'asc',
-          },
-        },
-        steps: {
-          orderBy: {
-            order: 'asc',
+            id: 'asc',
           },
         },
         _count: {
@@ -67,9 +91,10 @@ async function isUserFavorite(userId: string, recipeId: string) {
   }
 }
 
-export default async function RecipePage({ params }: { params: { id: string } }) {
+export default async function RecipePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
-  const recipe = await getRecipe(params.id);
+  const recipe = await getRecipe(id);
 
   if (!recipe) {
     notFound();
@@ -80,6 +105,9 @@ export default async function RecipePage({ params }: { params: { id: string } })
     : false;
 
   const totalTime = (recipe.prepTime || 0) + (recipe.cookTime || 0);
+
+  // Parse tags from comma-separated string
+  const tags = recipe.tags ? recipe.tags.split(',').filter((tag: string) => tag.trim() !== '') : [];
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -215,7 +243,7 @@ export default async function RecipePage({ params }: { params: { id: string } })
             </CardHeader>
             <CardBody>
               <ul className="space-y-2">
-                {recipe.ingredients.map((ingredient, index) => (
+                {recipe.ingredients.map((ingredient: Ingredient, index: number) => (
                   <li key={index} className="flex items-start">
                     <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3"></span>
                     <span className="text-gray-700 dark:text-gray-300">
@@ -237,18 +265,18 @@ export default async function RecipePage({ params }: { params: { id: string } })
               </h2>
             </CardHeader>
             <CardBody>
-              <ol className="space-y-4">
-                {recipe.steps.map((step, index) => (
-                  <li key={index} className="flex">
+              <div className="space-y-4">
+                {recipe.instructions.split('\n').map((instruction: string, index: number) => (
+                  <div key={index} className="flex">
                     <span className="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 font-medium mr-3">
                       {index + 1}
                     </span>
                     <span className="text-gray-700 dark:text-gray-300">
-                      {step.description}
+                      {instruction}
                     </span>
-                  </li>
+                  </div>
                 ))}
-              </ol>
+              </div>
             </CardBody>
           </Card>
         </div>
@@ -291,7 +319,7 @@ export default async function RecipePage({ params }: { params: { id: string } })
           </Card>
           
           {/* Tags Card */}
-          {recipe.tags && recipe.tags.length > 0 && (
+          {tags.length > 0 && (
             <Card>
               <CardHeader>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -300,12 +328,12 @@ export default async function RecipePage({ params }: { params: { id: string } })
               </CardHeader>
               <CardBody>
                 <div className="flex flex-wrap gap-2">
-                  {recipe.tags.map((tag, index) => (
+                  {tags.map((tag: string, index: number) => (
                     <span 
                       key={index}
                       className="inline-block px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
                     >
-                      {tag}
+                      {tag.trim()}
                     </span>
                   ))}
                 </div>

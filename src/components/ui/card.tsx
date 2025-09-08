@@ -1,13 +1,17 @@
-import { motion } from 'framer-motion';
+import { motion, HTMLMotionProps } from 'framer-motion';
 import { HTMLAttributes, ReactNode } from 'react';
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {
+interface CardProps extends Omit<HTMLMotionProps<'div'>, 'transition'> {
   children: ReactNode;
   className?: string;
   hover?: boolean;
+  transition?: {
+    duration: number;
+    delay?: number;
+  };
 }
 
-export function Card({ children, className = '', hover = true, ...props }: CardProps) {
+export function Card({ children, className = '', hover = true, transition = { duration: 0.3 }, ...props }: CardProps) {
   const cardClasses = `bg-white rounded-xl shadow-md overflow-hidden dark:bg-gray-800 ${className}`;
 
   return (
@@ -16,7 +20,7 @@ export function Card({ children, className = '', hover = true, ...props }: CardP
       whileHover={hover ? { y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' } : {}}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={transition}
       {...props}
     >
       {children}

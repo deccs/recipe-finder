@@ -41,6 +41,8 @@ export default function EditRecipePage() {
 
   useEffect(() => {
     const fetchRecipe = async () => {
+      if (!params?.id) return;
+      
       try {
         const response = await fetch(`/api/recipes/${params.id}`);
         
@@ -73,9 +75,11 @@ export default function EditRecipePage() {
     };
 
     fetchRecipe();
-  }, [params.id, router]);
+  }, [params?.id, router]);
 
   const handleSubmit = async (data: RecipeFormData) => {
+    if (!params?.id) return;
+    
     setIsSubmitting(true);
     
     try {

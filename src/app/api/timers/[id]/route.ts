@@ -6,10 +6,11 @@ import { prisma } from '@/lib/db';
 // GET a single timer by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
+    const { id } = await params;
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -17,7 +18,7 @@ export async function GET(
 
     const timer = await prisma.timer.findUnique({
       where: {
-        id: params.id,
+        id,
       },
     });
 
@@ -42,10 +43,11 @@ export async function GET(
 // PUT (update) a timer by ID
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
+    const { id } = await params;
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -57,7 +59,7 @@ export async function PUT(
     // Check if timer exists and belongs to the current user
     const existingTimer = await prisma.timer.findUnique({
       where: {
-        id: params.id,
+        id,
       },
     });
 
@@ -79,7 +81,7 @@ export async function PUT(
     // Update timer
     const updatedTimer = await prisma.timer.update({
       where: {
-        id: params.id,
+        id,
       },
       data: {
         ...(name !== undefined && { name }),
@@ -101,10 +103,11 @@ export async function PUT(
 // DELETE a timer by ID
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
+    const { id } = await params;
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -113,7 +116,7 @@ export async function DELETE(
     // Check if timer exists and belongs to the current user
     const existingTimer = await prisma.timer.findUnique({
       where: {
-        id: params.id,
+        id,
       },
     });
 
@@ -128,7 +131,7 @@ export async function DELETE(
     // Delete timer
     await prisma.timer.delete({
       where: {
-        id: params.id,
+        id,
       },
     });
 

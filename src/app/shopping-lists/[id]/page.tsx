@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useParams } from 'next/navigation';
-import { Card, CardBody, CardHeader } from '@/components/ui/card';
+import { Card, CardBody } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, Plus, Trash2, Check, ShoppingBag, ChefHat, X } from 'lucide-react';
@@ -12,7 +12,8 @@ import { toast } from 'react-hot-toast';
 interface ShoppingListItem {
   id: string;
   name: string;
-  quantity: string;
+  amount: string | number;
+  unit: string;
   completed: boolean;
 }
 
@@ -25,10 +26,10 @@ interface ShoppingList {
 }
 
 export default function ShoppingListDetailPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const params = useParams();
-  const listId = params.id as string;
+  const listId = params?.id as string;
   
   const [shoppingList, setShoppingList] = useState<ShoppingList | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,9 +38,12 @@ export default function ShoppingListDetailPage() {
   const [listName, setListName] = useState('');
   const [newItemName, setNewItemName] = useState('');
   const [newItemQuantity, setNewItemQuantity] = useState('');
+  const [newItemUnit, setNewItemUnit] = useState('');
   const [isAddingItem, setIsAddingItem] = useState(false);
 
-  const fetchShoppingList = async () => {
+  const fetchShoppingList = useCallback(async () => {
+    if (!listId) return;
+    
     setIsLoading(true);
     setError(null);
     
@@ -62,10 +66,10 @@ export default function ShoppingListDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [listId]);
 
   const handleUpdateListName = async () => {
-    if (!listName.trim()) {
+    if (!listName.trim() || !listId) {
       toast.error('Please enter a list name');
       return;
     }
@@ -94,26 +98,40 @@ export default function ShoppingListDetailPage() {
   };
 
   const handleAddItem = async () => {
-    if (!newItemName.trim()) {
+    if (!newItemName.trim() || !listId) {
       toast.error('Please enter an item name');
       return;
     }
     
     try {
-      const response = await fetch(`/api/shopping-lists/${listId}/items`, {
-        method: 'POST',
+      const response = await fetch(`/api/shopping-lists/${listId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          name: newItemName,
-          quantity: newItemQuantity || '1'
+          name: listName,
+          items: [
+            ...(shoppingList?.items || []).map(item => ({
+              name: item.name,
+              amount: item.amount,
+              unit: item.unit,
+              completed: item.completed
+            })),
+            {
+              name: newItemName,
+              amount: newItemQuantity || '1',
+              unit: newItemUnit || '',
+              completed: false
+            }
+          ]
         }),
       });
       
       if (response.ok) {
         setNewItemName('');
         setNewItemQuantity('');
+        setNewItemUnit('');
         setIsAddingItem(false);
         toast.success('Item added successfully');
         fetchShoppingList(); // Refresh the list
@@ -128,13 +146,28 @@ export default function ShoppingListDetailPage() {
   };
 
   const handleToggleItem = async (itemId: string, completed: boolean) => {
+    if (!listId) return;
+    
     try {
-      const response = await fetch(`/api/shopping-lists/${listId}/items/${itemId}`, {
+      // Update the item in the list
+      const updatedItems = (shoppingList?.items || []).map(item => 
+        item.id === itemId ? { ...item, completed: !completed } : item
+      );
+      
+      const response = await fetch(`/api/shopping-lists/${listId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ completed: !completed }),
+        body: JSON.stringify({ 
+          name: listName,
+          items: updatedItems.map(item => ({
+            name: item.name,
+            amount: item.amount,
+            unit: item.unit,
+            completed: item.completed
+          }))
+        }),
       });
       
       if (response.ok) {
@@ -150,9 +183,26 @@ export default function ShoppingListDetailPage() {
   };
 
   const handleDeleteItem = async (itemId: string) => {
+    if (!listId) return;
+    
     try {
-      const response = await fetch(`/api/shopping-lists/${listId}/items/${itemId}`, {
-        method: 'DELETE',
+      // Remove the item from the list
+      const updatedItems = (shoppingList?.items || []).filter(item => item.id !== itemId);
+      
+      const response = await fetch(`/api/shopping-lists/${listId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          name: listName,
+          items: updatedItems.map(item => ({
+            name: item.name,
+            amount: item.amount,
+            unit: item.unit,
+            completed: item.completed
+          }))
+        }),
       });
       
       if (response.ok) {
@@ -170,8 +220,19 @@ export default function ShoppingListDetailPage() {
 
   const handleAddIngredientsFromRecipe = () => {
     // This would open a modal or navigate to a recipe selection page
-    toast.info('This feature will be available soon');
+    toast('This feature will be available soon', { icon: 'ℹ️' });
   };
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/signin');
+      return;
+    }
+    
+    if (status === 'authenticated' && listId) {
+      fetchShoppingList();
+    }
+  }, [status, listId, fetchShoppingList, router]);
 
   if (status === 'loading') {
     return (
@@ -282,6 +343,13 @@ export default function ShoppingListDetailPage() {
                 className="w-24"
                 onKeyDown={(e) => e.key === 'Enter' && handleAddItem()}
               />
+              <Input
+                value={newItemUnit}
+                onChange={(e) => setNewItemUnit(e.target.value)}
+                placeholder="Unit"
+                className="w-24"
+                onKeyDown={(e) => e.key === 'Enter' && handleAddItem()}
+              />
               <Button
                 variant="primary"
                 onClick={handleAddItem}
@@ -295,6 +363,7 @@ export default function ShoppingListDetailPage() {
                   setIsAddingItem(false);
                   setNewItemName('');
                   setNewItemQuantity('');
+                  setNewItemUnit('');
                 }}
               >
                 <X className="h-4 w-4" />
@@ -364,7 +433,7 @@ export default function ShoppingListDetailPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {shoppingList.items.map((item) => (
+          {shoppingList.items.map((item: ShoppingListItem) => (
             <Card key={item.id} className="overflow-hidden">
               <CardBody className="p-4">
                 <div className="flex items-center">
@@ -377,7 +446,9 @@ export default function ShoppingListDetailPage() {
                   <div className={`ml-3 flex-1 ${item.completed ? 'line-through text-gray-500' : ''}`}>
                     <div className="flex justify-between">
                       <span className="font-medium">{item.name}</span>
-                      <span className="text-sm text-gray-500">{item.quantity}</span>
+                      <span className="text-sm text-gray-500">
+                        {item.amount} {item.unit}
+                      </span>
                     </div>
                   </div>
                   <Button
